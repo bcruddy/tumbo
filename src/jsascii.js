@@ -1,18 +1,14 @@
-!function() {
-
-	navigator.getUserMedia = navigator.getUserMedia ||
-		navigator.webkitGetUserMedia ||
-		navigator.mozGetUserMedia ||
-		navigator.msGetUserMedia;
-
+!function () {
 	/**
 	 * value to character mapping from dark to light
 	 * add more characters and they will be accounted for automatically
 	 * note: the extra &nbsp; is to account for the value range inclusive of 100%
 	 */
 	var chars = ['@','#','$','=','*','!',';',':','~','-',',','.','&nbsp;', '&nbsp;'];
-	var charLen = chars.length-1;
-	function getChar (val) { return chars[parseInt(val * charLen, 10)]; }
+	var charLen = chars.length - 1;
+	function getChar (val) {
+		return chars[parseInt(val * charLen, 10)];
+	}
 
 	/**
 	 * log when getUserMedia or when video metadata loading fail
@@ -52,18 +48,23 @@
 			el.addEventListener('load', function () {
                 that.render();
             });
-		} else if(nodeName === 'VIDEO') {
+		} else if (nodeName === 'VIDEO') {
 			this.interval = typeof params.interval === 'number' ? params.interval : 15;
 			this.webrtc = !!params.webrtc;
 
 			if (this.webrtc) {
-				if (typeof navigator.getUserMedia !== 'function') {
+				if (typeof navigator.mediaDevices.getUserMedia !== 'function') {
 					return logError((el.innerHTML = 'Error: browser does not support WebRTC'));
 				}
-				navigator.getUserMedia({video: true, audio: false}, function (localMediaStream) {
-					that.mediaStream = localMediaStream;
-					el.src = (window.URL || window.webkitURL).createObjectURL(localMediaStream);
-				}, logError);
+				navigator.mediaDevices.getUserMedia({
+					video: {width: 4000, height: 4000},
+					audio: false
+				})
+					.then(function (localMediaStream) {
+						that.mediaStream = localMediaStream;
+						el.src = (window.URL || window.webkitURL).createObjectURL(localMediaStream);
+					})
+					.catch(logError);
 			}
 			el.addEventListener('loadeddata', function () {
                 that.play();
@@ -107,11 +108,15 @@
 	 * gets context image data, perform ascii conversion, append string to container
 	 */
 	Jscii.prototype.render = function() {
-		var el = this.el, nodeName = el.nodeName, ratio;
-		var dim = this.dimension(), width, height;
-		if(!dim.width || !dim.height) {
-			ratio = nodeName === 'IMG' ? el.height/el.width : el.videoHeight/el.videoWidth;
-			this.dimension(this.width, parseInt(this.width*ratio, 10));
+		var el = this.el,
+			nodeName = el.nodeName,
+			ratio;
+		var dim = this.dimension(),
+			width,
+			height;
+		if (!dim.width || !dim.height) {
+			ratio = nodeName === 'IMG' ? el.height / el.width : el.videoHeight / el.videoWidth;
+			this.dimension(this.width, parseInt(this.width * ratio, 10));
 			dim = this.dimension();
 		}
 		width = dim.width;
@@ -138,18 +143,24 @@
             str = '';
 
 		// helper function to retrieve rgb value from pixel data
-		var getRGB = function(i) { return [d[i=i*4], d[i+1], d[i+2]]; };
+		var getRGB = function (i) {
+			return [d[i = i * 4], d[i + 1], d[i + 2]];
+		};
 
-		for (var i=0; i<len; i++) {
-			if(i%width === 0) str += '\n';
+		for (var i = 0; i < len; i++) {
+			if (i % width === 0) {
+				str += '\n';
+			}
 			var rgb = getRGB(i);
-			var val = Math.max(rgb[0], rgb[1], rgb[2])/255;
-			if(this.color) str += '<font style="color: rgb('+rgb.join(',')+')">'+getChar(val)+'</font>';
-			else str += getChar(val);
+			var val = Math.max(rgb[0], rgb[1], rgb[2]) / 255;
+			if (this.color) {
+				str += `<span style="color: rgb(${rgb.join(',')})">${getChar(val)}</span>`
+			} else {
+				str += getChar(val);
+			}
 		}
 		return str;
 	};
 
 	window.Jscii = Jscii;
-
 }();

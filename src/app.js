@@ -51,7 +51,7 @@ tumbo = {
             webrtc: true,
             interval: 333,
             fn: function (ascii) {
-                socket.emit('ascii video', ascii);
+                socket.emit('ascii video', {userName, ascii});
             }
         });
 
@@ -62,17 +62,20 @@ tumbo = {
             if (Object.keys(chatConnections).indexOf(data.id) === -1) {
                 chatConnections[data.id] = socket;
 
-                var wrapper = document.createElement('div');
-                wrapper.classList.add('col-md-6');
+                var row = document.createElement('div');
+                row.classList.add('row');
+                var col = document.createElement('div');
+                row.classList.add('col-md-12');
 
                 videoWindow = document.createElement('pre');
 
                 videoWindow.setAttribute('data-socket-id', data.id);
                 videoWindow.classList.add('video-pane');
 
-                wrapper.appendChild(videoWindow);
+                col.appendChild(videoWindow);
+                row.appendChild(col);
 
-                document.getElementById('video-windows').appendChild(wrapper);
+                document.getElementById('video-windows').appendChild(row);
             } else {
                 videoWindow = document.querySelector(`.video-pane[data-socket-id="${data.id}"]`);
             }

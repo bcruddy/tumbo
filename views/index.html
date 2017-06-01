@@ -20,7 +20,8 @@
             font: normal 12px/18px 'helvetica neue' arial;
             color: #333;
         }
-        .section pre.video-pane { font: bold 8px/5px monospace; color: #000; clear: left; }
+        #video-windows {font-size: 4px;}
+        .section pre.video-pane { font: bold 1em/.6em monospace; color: #000; clear: left; }
         video { width: 200px; }
         .clearfix:after {
             content: ".";
@@ -66,13 +67,15 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <h4 id="current-user"></h4>
-                <hr />
-                <ul id="messages"></ul>
-                <form action="" id="chat-form">
-                    <input id="m" autocomplete="off" /><button>Send</button>
-                </form>
-                <ul id="server-response"></ul>
+                <div style="position: fixed; right: 0; bottom: 0; top: 0; left: 70%;">
+                    <h4 id="current-user"></h4>
+                    <hr />
+                    <ul id="messages"></ul>
+                    <form action="" id="chat-form">
+                        <input id="m" autocomplete="off" /><button>Send</button>
+                    </form>
+                    <ul id="server-response"></ul>
+                </div>
             </div>
         </div>
     </section>
