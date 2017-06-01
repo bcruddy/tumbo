@@ -8,7 +8,7 @@
             font: normal 12px/18px 'helvetica neue' arial;
             color: #333;
         }
-        .section > pre { font: bold 8px/5px monospace; color: #000; clear: left; }
+        .section pre.video-pane { font: bold 8px/5px monospace; color: #000; clear: left; }
         video { width: 200px; }
         .clearfix:after {
             content: ".";
@@ -34,7 +34,7 @@
 <body>
     <section class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <h2>Webcam Feed to ASCII string <small>(must enable video)</small></h2>
                 <div class="section clearfix">
                     <video id="jscii-element-webrtc" controls autoplay>
@@ -44,11 +44,12 @@
                         <button id="play-webrtc">Start Render</button>
                         <button id="pause-webrtc">Pause Render</button>
                     </div>
-                    <pre id="ascii-container-webrtc" style="display: none;"></pre>
-                    <pre id="ascii-container-webrtc-incoming"></pre>
+                    <div id="video-windows">
+                        <pre id="ascii-container-webrtc" style="display: none;"></pre>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <h4 id="current-user"></h4>
                 <hr />
                 <ul id="messages"></ul>
@@ -112,13 +113,35 @@
                 webrtc: true,
                 interval: 200,
                 fn: function (ascii) {
-                    console.log('ascii', ascii.length);
                     socket.emit('ascii video', ascii);
                 }
             });
 
-            socket.on('ascii video', function (ascii) {
-                document.getElementById('ascii-container-webrtc-incoming').innerHTML = ascii;
+            const chatConnections = {};
+
+            socket.on('ascii video', function (data) {
+                var videoWindow;
+                if (Object.keys(chatConnections).indexOf(data.id) === -1) {
+                    chatConnections[data.id] = socket;
+
+                    var wrapper = document.createElement('div');
+                    wrapper.classList.add('col-md-6');
+
+                    videoWindow = document.createElement('pre');
+
+                    videoWindow.setAttribute('data-socket-id', data.id);
+                    videoWindow.classList.add('video-pane');
+
+                    wrapper.appendChild(videoWindow);
+
+                    document.getElementById('video-windows').appendChild(wrapper);
+                } else {
+                    videoWindow = document.querySelector(`.video-pane[data-socket-id="${data.id}"]`);
+                }
+
+                // check to see if socket id is already being displayed
+                // if not, create a new display
+                videoWindow.innerHTML = data.ascii;
             });
 
             document.getElementById('play-webrtc').addEventListener('click', function() { webcamJscii.play(); });
