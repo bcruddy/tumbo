@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Socket.IO chat</title>
+    <title>tumbo | ascii chat</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <style type="text/css">
         html, body {
@@ -35,14 +35,18 @@
     <section class="container-fluid">
         <div class="row">
             <div class="col-md-8">
-                <h2>Webcam Feed to ASCII string <small>(must enable video)</small></h2>
+                <h2>tumbo ascii chat</h2>
                 <div class="section clearfix">
-                    <video id="jscii-element-webrtc" controls autoplay>
+                    <video id="jscii-element-webrtc" controls autoplay style="display: none;">
                         Your browser does not support video
                     </video>
-                    <div>
-                        <button id="play-webrtc">Start Render</button>
-                        <button id="pause-webrtc">Pause Render</button>
+                    <div class="btn-group">
+                        <button id="play-webrtc" class="btn btn-sm btn-success">
+                            Start Render
+                        </button>
+                        <button id="pause-webrtc" class="btn btn-sm btn-danger">
+                            Pause Render
+                        </button>
                     </div>
                     <div id="video-windows">
                         <pre id="ascii-container-webrtc" style="display: none;"></pre>
