@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <style type="text/css">
+        html, body {
+            font: normal 12px/18px 'helvetica neue' arial;
+            color: #333;
+        }
+        .section > pre { font: bold 8px/5px monospace; color: #000; clear: left; }
+        video { width: 200px; }
+        .clearfix:after {
+            content: ".";
+            display: block;
+            clear: both;
+            visibility: hidden;
+            line-height: 0;
+            height: 0;
+        }
+        .clearfix { display: inline-block; }
+    </style>
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 13px Helvetica, Arial; }
+    form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+    form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+    form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages li { padding: 5px 10px; }
+    #messages li:nth-child(odd) { background: #eee; }
+    </style>
+</head>
+<body>
+    <h2>Webcam Feed to ASCII string <small>(must enable video)</small></h2>
+	<div class="section clearfix">
+		<video id="jscii-element-webrtc" controls autoplay>
+			Your browser does not support video
+		</video>
+		<div>
+			<button id="play-webrtc">Start Render</button>
+			<button id="pause-webrtc">Pause Render</button>
+		</div>
+		<pre id="ascii-container-webrtc"></pre>
+	</div>
+    <hr />
+    <h4 id="current-user"></h4>
+    <hr />
+    <ul id="messages"></ul>
+    <form action="" id="chat-form">
+        <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <ul id="server-response"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
+    <script src="/assets/jsascii.js"></script>
+    <script>
+        window.onload = function () {
+            const userName = prompt('Enter username');
+
+            document.getElementById('current-user').textContent = userName;
+
+            const socket = io(),
+                chatForm = document.getElementById('chat-form'),
+                responseList = document.getElementById('server-response'),
+                createResponseItem = (res, index = -1) => {
+                    let data = JSON.parse(res),
+                        listItem = document.createElement('li');
+
+                    listItem.dataset.index = index;
+                    listItem.textContent = data.message;
+
+                    listItem.innerHTML = `
+                        <strong class="username">${data.user}:</strong>
+                        <small class="date">(${data.date})</small>
+                        <span class="message">${data.message}</span>`;
+
+                    return listItem;
+                };
+
+            chatForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                let message = document.getElementById('m'),
+                    data = JSON.stringify({
+                        user: userName,
+                        message: message.value,
+                        date: new Date()
+                    });
+
+                socket.emit('chat message', data);
+
+                message.value = '';
+
+                return false;
+            });
+
+            socket.on('chat message', msg => {
+                responseList.appendChild(createResponseItem(msg));
+            });
+        }
+    </script>
+
+    <script>
+        var webcamJscii = new Jscii({
+            container: document.getElementById('ascii-container-webrtc'),
+            el: document.getElementById('jscii-element-webrtc'),
+            webrtc: true,
+            interval: 75,
+            fn: function (ascii) {
+            }
+        });
+
+        document.getElementById('play-webrtc').addEventListener('click', function() { webcamJscii.play(); });
+        document.getElementById('pause-webrtc').addEventListener('click', function() { webcamJscii.pause(); });
+    </script>
+</body>
+</html>

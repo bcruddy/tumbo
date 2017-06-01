@@ -1,0 +1,21 @@
+{
+    "name": "tumbo",
+    "version": "0.0.1",
+    "description": "websocket ascii videochat app",
+    "main": "lib/server",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon lib/server.js"
+    },
+    "author": "brian ruddy <briancruddy@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.15.3",
+        "express-url-cleaner": "^0.0.9",
+        "no-slash": "^1.2.15",
+        "socket.io": "^2.0.1"
+    },
+    "devDependencies": {
+        "nodemon": "^1.11.0"
+    }
+}
