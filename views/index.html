@@ -70,11 +70,18 @@
                 <div style="position: fixed; right: 0; bottom: 0; top: 0; left: 70%;">
                     <h4 id="current-user"></h4>
                     <hr />
-                    <ul id="messages"></ul>
                     <form action="" id="chat-form">
                         <input id="m" autocomplete="off" /><button>Send</button>
                     </form>
-                    <ul id="server-response"></ul>
+                    <ul id="server-response" style="
+                                            position: absolute;
+                                            top: 75px;
+                                            left: 0;
+                                            bottom: 0;
+                                            right: 0;
+                                            overflow-y: auto;
+                                            height: calc(100% - 125px);">
+                    </ul>
                 </div>
             </div>
         </div>
