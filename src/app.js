@@ -43,6 +43,7 @@ tumbo = {
 
         socket.on('chat message', msg => {
             responseList.appendChild(createResponseItem(msg));
+            responseList.scrollTop = responseList.scrollHeight; // scroll to bottom of chat
         });
 
         var webcamJscii = new Jscii({
@@ -55,7 +56,8 @@ tumbo = {
             }
         });
 
-        const chatConnections = {};
+        const chatConnections = {},
+            videoWrapper = document.getElementById('video-windows');
 
         socket.on('ascii video', function (data) {
             var videoWindow;
@@ -75,7 +77,7 @@ tumbo = {
                 col.appendChild(videoWindow);
                 row.appendChild(col);
 
-                document.getElementById('video-windows').appendChild(row);
+                videoWrapper.appendChild(row);
             } else {
                 videoWindow = document.querySelector(`.video-pane[data-socket-id="${data.id}"]`);
             }
@@ -89,7 +91,7 @@ tumbo = {
             if (socketId in chatConnections) {
                 delete chatConnections[socketId];
                 var videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`);
-                videoWindow.parentNode.parentNode.removeChild(videoWindow.parentNode);
+                videoWrapper.emoveChild(videoWindow.parentNode);
             }
         });
 
