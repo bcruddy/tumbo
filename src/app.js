@@ -62,16 +62,14 @@ tumbo = {
                 videoWindow = document.querySelector(`.video-pane[data-socket-id="${data.id}"]`);
             }
 
-            // check to see if socket id is already being displayed
-            // if not, create a new display
-            videoWindow.innerHTML = data.ascii;
+            videoWindow.innerHTML = LZString.decompressFromUTF16(data.ascii);
         });
 
         socket.on('disconnect', (socketId) => {
             if (socketId in chatConnections) {
                 delete chatConnections[socketId];
                 var videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`);
-                this.elements.videoWrapper.emoveChild(videoWindow.parentNode);
+                this.elements.videoWrapper.removeChild(videoWindow.parentNode);
             }
         });
 
@@ -90,7 +88,9 @@ tumbo = {
             webrtc: true,
             interval: 333,
             fn: function (ascii) {
-                socket.emit('ascii video', {userName, ascii});
+                let compressed = LZString.compressToUTF16(ascii);
+
+                socket.emit('ascii video', {userName, ascii: compressed});
             }
         });
     },
