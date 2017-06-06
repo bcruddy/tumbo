@@ -57,9 +57,9 @@
 					return logError((el.innerHTML = 'Error: browser does not support WebRTC'));
 				}
 				navigator.mediaDevices.getUserMedia({
-					video: {width: 4000, height: 4000},
-					audio: false
-				})
+						video: {width: 4000, height: 4000},
+						audio: false
+					})
 					.then(function (localMediaStream) {
 						that.mediaStream = localMediaStream;
 						el.src = (window.URL || window.webkitURL).createObjectURL(localMediaStream);
@@ -77,17 +77,23 @@
 	 */
 	Jscii.prototype.play = function () {
 		var that = this;
-		that.pause().videoTimer = setInterval(function() {
-			if(that.mediaStream || !that.webrtc) that.render();
+		that.pause().videoTimer = setInterval(function () {
+			if (that.mediaStream || !that.webrtc) {
+				that.render();
+			}
 		}, that.interval);
+
 		return that;
 	};
 
 	/**
 	 * pause rendering, for video type only
 	 */
-	Jscii.prototype.pause = function() {
-		if(this.videoTimer) clearInterval(this.videoTimer);
+	Jscii.prototype.pause = function () {
+		if (this.videoTimer) {
+			 clearInterval(this.videoTimer)
+		};
+
 		return this;
 	};
 
@@ -95,9 +101,10 @@
 	 * getter/setter for output dimension
 	 */
 	Jscii.prototype.dimension = function(width, height) {
-		if(typeof width === 'number' && typeof height === 'number') {
+		if (typeof width === 'number' && typeof height === 'number') {
 			this._scaledWidth = this.canvas.width = width;
 			this._scaledHeight = this.canvas.height = height;
+
 			return this;
 		} else {
 			return { width: this._scaledWidth, height: this._scaledHeight };
@@ -123,13 +130,22 @@
 		height = dim.height;
 
 		// might take a few cycles before we
-		if(!width || !height) return;
+		if(!width || !height) {
+			return;
+		}
 
 		this.ctx.drawImage(this.el, 0, 0, width, height);
 		this.imageData = this.ctx.getImageData(0, 0, width, height).data;
+
 		var asciiStr = this.getAsciiString();
-		if(this.container) this.container.innerHTML = asciiStr;
-		if(this.fn) this.fn(asciiStr);
+
+		// dont append this locally for now
+		// if (this.container) {
+		// 	this.container.innerHTML = asciiStr;
+		// }
+		if (this.fn) {
+			this.fn(asciiStr);
+		}
 	};
 
 	/**
