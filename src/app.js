@@ -14,7 +14,7 @@ tumbo = {
             socket = io();
 
         this.elements.currentUserName.textContent = userName;
-        this.createWebcamVideo(socket, userName);
+        this.webcamJscii = this.createWebcamVideo(socket, userName);
 
         this.elements.chatForm.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -68,16 +68,22 @@ tumbo = {
         socket.on('disconnect', (socketId) => {
             if (socketId in chatConnections) {
                 delete chatConnections[socketId];
+
                 var videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`);
-                videoWindow.parentNode.parentNode.removeChild(videoWindow.parentNode);
+
+                try {
+                    videoWindow.parentNode.parentNode.removeChild(videoWindow.parentNode);
+                } catch (ex) {
+                    console.warn(ex);
+                }
             }
         });
 
-        document.getElementById('play-webrtc').addEventListener('click', function() {
-            webcamJscii.play();
+        document.getElementById('play-webrtc').addEventListener('click', () => {
+            this.webcamJscii.play();
         });
-        document.getElementById('pause-webrtc').addEventListener('click', function() {
-            webcamJscii.pause();
+        document.getElementById('pause-webrtc').addEventListener('click', () => {
+            this.webcamJscii.pause();
         });
     },
 
