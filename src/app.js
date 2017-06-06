@@ -34,7 +34,7 @@ tumbo = {
         });
 
         socket.on('chat message', msg => {
-            this.elements.chatList.appendChild(this.createResponseItem(msg));
+            this.elements.chatList.appendChild(this.createChatItem(msg));
             this.elements.chatList.scrollTop = this.elements.chatList.scrollHeight; // scroll to bottom of chat
         });
 
