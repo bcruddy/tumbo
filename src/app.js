@@ -69,7 +69,7 @@ tumbo = {
             if (socketId in chatConnections) {
                 delete chatConnections[socketId];
                 var videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`);
-                this.elements.videoWrapper.removeChild(videoWindow.parentNode);
+                videoWindow.parentNode.parentNode.removeChild(videoWindow.parentNode);
             }
         });
 
