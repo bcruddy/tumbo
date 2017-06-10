@@ -1,0 +1,28 @@
+html, body {
+    font: normal 12px/18px 'helvetica neue' arial;
+    color: #333;
+}
+#video-windows {font-size: 4px; margin-top: 20px;}
+.video-wrapper { display: inline-block; }
+.video-pane { font: bold 1em/.6em monospace; color: #000; clear: left; }
+
+.chat-container {}
+#chat-thread {
+    overflow-y: auto;
+}
+    #chat-thread .chat-item {
+        border-bottom: 1px solid #CCC;
+        margin-bottom: 1em;
+        padding-bottom: .5em;
+    }
+        #chat-thread .username {}
+        #chat-thread .date {}
+        #chat-thread .message {
+            display: block;
+        }
+
+#chat-form {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+}

@@ -3,27 +3,43 @@ let tumbo = window.tumbo || {};
 tumbo = {
     elements: {
         chatForm: document.getElementById('chat-form'),
-        chatList: document.getElementById('server-response'),
+        chatMessageTextarea: document.getElementById('chat-message'),
+        chatThread: document.getElementById('chat-thread'),
         currentUserName: document.getElementById('current-user'),
         videoWrapper: document.getElementById('video-windows')
     },
 
-    init: function () {
+    init () {
         const chatConnections = {},
-            userName = prompt('Enter username'),
-            socket = io();
+            userName = this.username = prompt('Enter username'),
+            socket = this.socket = io();
 
         this.elements.currentUserName.textContent = userName;
         this.webcamJscii = this.createWebcamVideo(socket, userName);
+        this.formatChatTextarea();
+
+        this.elements.chatMessageTextarea.addEventListener('keypress', (event) => {
+            event = event || window.event;
+
+            let keyCode = event.keyCode || event.which,
+                submit;
+
+            if (keyCode !== 13) {
+                return;
+            }
+
+            submit = new Event('submit');
+            this.elements.chatForm.dispatchEvent(submit);
+        });
 
         this.elements.chatForm.addEventListener('submit', (event) => {
             event.preventDefault();
 
-            let message = document.getElementById('m'),
+            let message = this.elements.chatMessageTextarea,
                 data = JSON.stringify({
                     user: userName,
                     message: message.value,
-                    date: new Date()
+                    date: this.timestamp
                 });
 
             socket.emit('chat message', data);
@@ -34,31 +50,36 @@ tumbo = {
         });
 
         socket.on('chat message', msg => {
-            this.elements.chatList.appendChild(this.createChatItem(msg));
-            this.elements.chatList.scrollTop = this.elements.chatList.scrollHeight; // scroll to bottom of chat
+            this.elements.chatThread.appendChild(this.createChatItem(msg));
+            this.elements.chatThread.scrollTop = this.elements.chatThread.scrollHeight; // scroll to bottom of chat
         });
 
         socket.on('ascii video', (data) => {
-            var videoWindow;
+            let videoWindow;
 
             if (!(data.id in chatConnections)) {
+                let row = document.createElement('div'),
+                    col = document.createElement('div'),
+                    displayWrapper = document.createElement('div');
+
                 chatConnections[data.id] = socket;
 
-                var row = document.createElement('div');
                 row.classList.add('row');
-                var col = document.createElement('div');
-                row.classList.add('col-md-12');
+                col.classList.add('col-md-12');
+                displayWrapper.classList.add('video-wrapper');
 
                 videoWindow = document.createElement('pre');
 
                 videoWindow.setAttribute('data-socket-id', data.id);
                 videoWindow.classList.add('video-pane');
 
-                col.appendChild(videoWindow);
+                displayWrapper.appendChild(videoWindow);
+                col.appendChild(displayWrapper);
                 row.appendChild(col);
 
                 this.elements.videoWrapper.appendChild(row);
-            } else {
+            }
+            else {
                 videoWindow = document.querySelector(`.video-pane[data-socket-id="${data.id}"]`);
             }
 
@@ -69,13 +90,20 @@ tumbo = {
             if (socketId in chatConnections) {
                 delete chatConnections[socketId];
 
-                var videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`);
+                let videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`),
+                    disconnectData = {
+                        message: `User ${socketId} has disconnected.`,
+                        date: this.timestamp
+                    };
 
                 try {
                     videoWindow.parentNode.parentNode.removeChild(videoWindow.parentNode);
-                } catch (ex) {
+                }
+                catch (ex) {
                     console.warn(ex);
                 }
+
+                this.elements.chatThread.appendChild(this.createChatItem());
             }
         });
 
@@ -87,13 +115,13 @@ tumbo = {
         });
     },
 
-    createWebcamVideo: function (socket, userName) {
+    createWebcamVideo (socket, userName) {
         return new Jscii({
             container: document.getElementById('ascii-container-webrtc'),
             el: document.getElementById('jscii-element-webrtc'),
             webrtc: true,
-            interval: 333,
-            fn: function (ascii) {
+            interval: 200,
+            fn: (ascii) => {
                 let compressed = LZString.compressToUTF16(ascii);
 
                 socket.emit('ascii video', {userName, ascii: compressed});
@@ -101,18 +129,28 @@ tumbo = {
         });
     },
 
-    createChatItem: function (serverResponse, index = -1) {
+    createChatItem (serverResponse, index = -1) {
         let data = JSON.parse(serverResponse),
+            {user, date, message} = data,
             listItem = document.createElement('li');
 
+        listItem.classList.add('chat-item');
         listItem.dataset.index = index;
         listItem.textContent = data.message;
 
         listItem.innerHTML = `
-            <strong class="username">${data.user}:</strong>
-            <small class="date">(${data.date})</small>
-            <span class="message">${data.message}</span>`;
+            <strong class="username">${user}</strong>
+            <small class="date text-muted">${date}</small>
+            <span class="message">${message}</span>`;
 
         return listItem;
+    },
+
+    formatChatTextarea () {
+        this.elements.chatForm.style.maxWidth = `${this.elements.chatThread.offsetWidth}px`;
+    },
+
+    get timestamp () {
+        return moment().format('h:mm a');
     }
 }
