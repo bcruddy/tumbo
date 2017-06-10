@@ -4,6 +4,7 @@ tumbo = {
     elements: {
         chatForm: document.getElementById('chat-form'),
         chatMessageTextarea: document.getElementById('chat-message'),
+        chatMessageSubmit: document.getElementById('chat-submit'),
         chatThread: document.getElementById('chat-thread'),
         currentUserName: document.getElementById('current-user'),
         videoWrapper: document.getElementById('video-windows')
@@ -16,20 +17,18 @@ tumbo = {
 
         this.elements.currentUserName.textContent = userName;
         this.webcamJscii = this.createWebcamVideo(socket, userName);
-        this.formatChatTextarea();
 
-        this.elements.chatMessageTextarea.addEventListener('keypress', (event) => {
+        this.elements.chatMessageSubmit.onclick = this.submitChatForm.bind(this);
+        this.elements.chatMessageTextarea.addEventListener('keypress', event => {
             event = event || window.event;
 
-            let keyCode = event.keyCode || event.which,
-                submit;
+            let keyCode = event.keyCode || event.which;
 
             if (keyCode !== 13) {
                 return;
             }
 
-            submit = new Event('submit');
-            this.elements.chatForm.dispatchEvent(submit);
+            this.submitChatForm();
         });
 
         this.elements.chatForm.addEventListener('submit', (event) => {
@@ -44,7 +43,9 @@ tumbo = {
 
             socket.emit('chat message', data);
 
-            message.value = '';
+            setTimeout(() => {
+                message.value = '';
+            }, 1);
 
             return false;
         });
@@ -149,6 +150,16 @@ tumbo = {
 
     formatChatTextarea () {
         this.elements.chatForm.style.maxWidth = `${this.elements.chatThread.offsetWidth}px`;
+    },
+
+    submitChatForm () {
+        if (!this.elements.chatMessageTextarea.value.length) {
+            return alert('You cannot submit an empty message.');
+        }
+
+        let submit = new Event('submit');
+
+        this.elements.chatForm.dispatchEvent(submit);
     },
 
     get timestamp () {

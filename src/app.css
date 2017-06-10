@@ -23,6 +23,16 @@ html, body {
 
 #chat-form {
     position: fixed;
-    bottom: 10px;
-    width: 100%;
+    bottom: 0px;
+    left: 0;
+    right: 0;
 }
+    #chat-form .chat-form-container > * {
+        border-radius: 0;
+    }
+    #chat-form #chat-submit:hover {
+        cursor: pointer;
+    }
+    #chat-form #chat-message {
+        min-height: 80px;
+    }
