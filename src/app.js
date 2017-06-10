@@ -91,10 +91,11 @@ tumbo = {
                 delete chatConnections[socketId];
 
                 let videoWindow = document.querySelector(`.video-pane[data-socket-id="${socketId}"]`),
-                    disconnectData = {
+                    disconnectData = JSON.stringify({
+                        user: 'tumbo',
                         message: `User ${socketId} has disconnected.`,
                         date: this.timestamp
-                    };
+                    });
 
                 try {
                     videoWindow.parentNode.parentNode.removeChild(videoWindow.parentNode);
@@ -103,7 +104,7 @@ tumbo = {
                     console.warn(ex);
                 }
 
-                this.elements.chatThread.appendChild(this.createChatItem());
+                this.elements.chatThread.appendChild(this.createChatItem(disconnectData));
             }
         });
 

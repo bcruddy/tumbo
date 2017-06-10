@@ -15,11 +15,11 @@ html, body {
         margin-bottom: 1em;
         padding-bottom: .5em;
     }
-        #chat-thread .username {}
-        #chat-thread .date {}
-        #chat-thread .message {
-            display: block;
-        }
+    #chat-thread .username {}
+    #chat-thread .date {}
+    #chat-thread .message {
+        display: block;
+    }
 
 #chat-form {
     position: fixed;
